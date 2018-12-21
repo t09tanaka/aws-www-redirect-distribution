@@ -1,0 +1,30 @@
+---
+AWSTemplateFormatVersion: 2010-09-09
+
+
+Description: >
+  This template will build distribution and S3 bucket for www to main domain redirection.
+
+Parameters:
+  DomainName:
+    Type: String
+    AllowedPattern: ^$|(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])$
+    Description: >
+      Your main domain.
+  AcmCertificate:
+    Type: String
+    AllowedPattern: ^$|(arn:aws:acm:)([a-z0-9/:-])*([a-z0-9])$
+    Description: >
+      CloudFront Certificate ARN
+
+Resources:
+
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub www.${DomainName}
+      AccessControl: PublicRead
+      WebsiteConfiguration:
+        RedirectAllRequestsTo:
+          HostName: !Ref DomainName
+          Protocol: https
