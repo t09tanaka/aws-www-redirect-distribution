@@ -8,11 +8,13 @@ Description: >
 Parameters:
   DomainName:
     Type: String
+    Default: 'razerbeampunch.com'
     AllowedPattern: ^$|(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])$
     Description: >
       Your main domain.
   AcmCertificate:
     Type: String
+    Default: 'arn:aws:acm:us-east-1:416005914639:certificate/35a67aa6-49c5-49c0-8fe2-90a91a6eb5e1'
     AllowedPattern: ^$|(arn:aws:acm:)([a-z0-9/:-])*([a-z0-9])$
     Description: >
       CloudFront Certificate ARN
@@ -28,3 +30,40 @@ Resources:
         RedirectAllRequestsTo:
           HostName: !Ref DomainName
           Protocol: https
+
+  CloudFrontDistributionSslCertificate:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Aliases:
+        - !Sub www.${DomainName}
+        Comment: www to main
+        DefaultCacheBehavior:
+          AllowedMethods:
+          - DELETE
+          - GET
+          - HEAD
+          - OPTIONS
+          - PATCH
+          - POST
+          - PUT
+          DefaultTTL: 0
+          MaxTTL: 0
+          MinTTL: 0
+          ForwardedValues:
+            QueryString: true
+            Cookies:
+              Forward: all
+          TargetOriginId: s3bucket
+          ViewerProtocolPolicy: redirect-to-https
+        Origins:
+        - DomainName: !Select [2, !Split ["/", !GetAtt S3Bucket.WebsiteURL]]
+          Id: s3bucket
+          CustomOriginConfig:
+            OriginProtocolPolicy: http-only
+        PriceClass: PriceClass_All
+        HttpVersion: http2
+        ViewerCertificate:
+          AcmCertificateArn: !Ref AcmCertificate
+          SslSupportMethod: sni-only
+        Enabled: true
