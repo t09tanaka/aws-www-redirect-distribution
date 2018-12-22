@@ -2,7 +2,7 @@
 
 This template will build distribution and S3 bucket for www subdomain to main domain redirection.
 
-![Diagram](https://github.com/t09tanaka/aws-www-redirect-distribution/images/diagram.png "Diagram")
+![Diagram](https://github.com/t09tanaka/aws-www-redirect-distribution/blob/master/images/diagram.png "Diagram")
 
 ## How do I...?
 
